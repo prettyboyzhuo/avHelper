@@ -79,5 +79,10 @@ public interface MainService {
 	 * @throws IOException 
 	 */
 	public void generatePseudoVideo(String urlName) throws IOException;
+
+	/**
+	 * 将本地路径中的视频文件重新命名为番号的标准格式，如 ssni-001
+	 */
+	void renameFile();
 	
 }

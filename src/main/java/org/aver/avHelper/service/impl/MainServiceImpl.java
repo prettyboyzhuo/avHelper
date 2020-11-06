@@ -16,6 +16,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import cn.hutool.core.io.FileUtil;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.aver.avHelper.service.MainService;
@@ -90,6 +91,49 @@ public class MainServiceImpl implements MainService {
 		XmlHandler.generateMovies(movieList, ConfigStatic.tempRootPath, ConfigStatic.moviesXmlName, true);
 		return movieList;
 	}
+
+//	public static void main(String[] args) throws IOException {
+//		File file = new File("Y:\\home\\Data");
+//		String localDir = "D:\\moviebak";
+////		new File(localDir +"\\"+ "data").mkdir();
+////		System.out.println(file.getParent());
+//		copyMirror(file, localDir);
+//	}
+
+	public static void copyMirror(File file, String localDir) throws IOException {
+		if (file.isDirectory()){
+			System.out.println("创建文件夹" + localDir +"\\"+ file.getName());
+			new File(localDir + "\\" + file.getName()).mkdir();
+			localDir = localDir + "\\"+file.getName();
+		}else if (file.isFile()){
+			System.out.println("创建文件" + localDir +"\\"+ file.getName());
+			new File(localDir +"\\"+ file.getName()).createNewFile();
+		}
+		File[] fList = file.listFiles();//获取路径下所有目录和文件
+		if(fList != null){
+			for (File f:fList) {
+				copyMirror(f, localDir);//递归
+			}
+		}
+	}
+
+	public static void print(File file, int level){
+		for(int i = 0; i < level; ++i) {
+			System.out.print("\t");//按层次输出\t
+		}
+		if(file.isDirectory()){
+//			file.mkdir();
+			System.out.println(file.getName() + "/");
+		}else if(file.isFile()) {
+			System.out.println(file.getName());
+		}
+		File[] fList = file.listFiles();//获取路径下所有目录和文件
+		if(fList != null){
+			for (File f:fList) {
+				print(f, level+1);//递归
+			}
+		}
+	}
 	
 	@Override
 	public List<Movie> generateRenameConfig(String usedRule, String usedSite) throws IOException {
@@ -105,7 +149,7 @@ public class MainServiceImpl implements MainService {
 		// 番号正则
 		String nameRegEx = null;
 		if ("rule1".equals(usedRule)) {
-			nameRegEx = "[a-z]+[0-9]+";
+			nameRegEx = "[A-Za-z]+-[0-9]+";
 		}else if ("rule2".equals(usedRule)) {
 			nameRegEx = "[0-9]+[a-z]+[0-9]+";
 		}else {
@@ -419,5 +463,36 @@ public class MainServiceImpl implements MainService {
 			i++;
 		}
 	}
-	
+
+	@Override
+	public void renameFile() {
+		//重命名规则
+		String nameRegEx = "[A-Za-z]+-[0-9]+";
+		String filename = "";
+		Pattern p =Pattern.compile(nameRegEx);
+		p.split("(NATURAL HIGH)(NHDTB-090)宙に浮くほどイキ跳ねる「エビ反り薬漬けエステ」10 全員中出し再会SPECIAL");
+		boolean matches = filename.matches(nameRegEx);
+		String localDir = "D:\\data\\1.txt";
+		File file = new File(localDir);
+		File file2 = new File("D:\\data\\2.txt");
+		file.renameTo(file2);
+
+
+	}
+
+	public static void main(String[] args) {
+		String nameRegEx = "[A-Za-z]+[0-9]+";
+		String filename = "(NATURAL HIGH)(NHDTB-090)宙に浮くほどイキ跳ねる「エビ反り薬漬けエステ」10 全員中出し再会SPECIAL";
+		String s = filename.replaceAll("-", "");
+		System.out.println(s);
+		Pattern p =Pattern.compile(nameRegEx);
+		Matcher matcher = p.matcher(s);
+		while (matcher.find()){
+			System.out.println(matcher.group());
+		}
+
+	}
+
+
+
 }

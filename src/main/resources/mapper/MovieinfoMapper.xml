@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.aver.avHelper.mapper.MovieinfoMapper">
+  <resultMap id="BaseResultMap" type="org.aver.avHelper.entity.Movieinfo">
+    <!--@mbg.generated-->
+    <!--@Table movieinfo-->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="original_name" jdbcType="VARCHAR" property="originalName" />
+    <result column="new_name" jdbcType="VARCHAR" property="newName" />
+    <result column="web_site" jdbcType="VARCHAR" property="webSite" />
+    <result column="title" jdbcType="VARCHAR" property="title" />
+    <result column="sorttitle" jdbcType="VARCHAR" property="sorttitle" />
+    <result column="director" jdbcType="VARCHAR" property="director" />
+    <result column="year" jdbcType="VARCHAR" property="year" />
+    <result column="releasedate" jdbcType="VARCHAR" property="releasedate" />
+    <result column="local_path" jdbcType="VARCHAR" property="localPath" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    id, original_name, new_name, web_site, title, sorttitle, director, `year`, releasedate, 
+    local_path
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    <!--@mbg.generated-->
+    select 
+    <include refid="Base_Column_List" />
+    from movieinfo
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    <!--@mbg.generated-->
+    delete from movieinfo
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="org.aver.avHelper.entity.Movieinfo">
+    <!--@mbg.generated-->
+    insert into movieinfo (id, original_name, new_name, 
+      web_site, title, sorttitle, 
+      director, `year`, releasedate, 
+      local_path)
+    values (#{id,jdbcType=INTEGER}, #{originalName,jdbcType=VARCHAR}, #{newName,jdbcType=VARCHAR}, 
+      #{webSite,jdbcType=VARCHAR}, #{title,jdbcType=VARCHAR}, #{sorttitle,jdbcType=VARCHAR}, 
+      #{director,jdbcType=VARCHAR}, #{year,jdbcType=VARCHAR}, #{releasedate,jdbcType=VARCHAR}, 
+      #{localPath,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="org.aver.avHelper.entity.Movieinfo">
+    <!--@mbg.generated-->
+    insert into movieinfo
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="originalName != null">
+        original_name,
+      </if>
+      <if test="newName != null">
+        new_name,
+      </if>
+      <if test="webSite != null">
+        web_site,
+      </if>
+      <if test="title != null">
+        title,
+      </if>
+      <if test="sorttitle != null">
+        sorttitle,
+      </if>
+      <if test="director != null">
+        director,
+      </if>
+      <if test="year != null">
+        `year`,
+      </if>
+      <if test="releasedate != null">
+        releasedate,
+      </if>
+      <if test="localPath != null">
+        local_path,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="originalName != null">
+        #{originalName,jdbcType=VARCHAR},
+      </if>
+      <if test="newName != null">
+        #{newName,jdbcType=VARCHAR},
+      </if>
+      <if test="webSite != null">
+        #{webSite,jdbcType=VARCHAR},
+      </if>
+      <if test="title != null">
+        #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="sorttitle != null">
+        #{sorttitle,jdbcType=VARCHAR},
+      </if>
+      <if test="director != null">
+        #{director,jdbcType=VARCHAR},
+      </if>
+      <if test="year != null">
+        #{year,jdbcType=VARCHAR},
+      </if>
+      <if test="releasedate != null">
+        #{releasedate,jdbcType=VARCHAR},
+      </if>
+      <if test="localPath != null">
+        #{localPath,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="org.aver.avHelper.entity.Movieinfo">
+    <!--@mbg.generated-->
+    update movieinfo
+    <set>
+      <if test="originalName != null">
+        original_name = #{originalName,jdbcType=VARCHAR},
+      </if>
+      <if test="newName != null">
+        new_name = #{newName,jdbcType=VARCHAR},
+      </if>
+      <if test="webSite != null">
+        web_site = #{webSite,jdbcType=VARCHAR},
+      </if>
+      <if test="title != null">
+        title = #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="sorttitle != null">
+        sorttitle = #{sorttitle,jdbcType=VARCHAR},
+      </if>
+      <if test="director != null">
+        director = #{director,jdbcType=VARCHAR},
+      </if>
+      <if test="year != null">
+        `year` = #{year,jdbcType=VARCHAR},
+      </if>
+      <if test="releasedate != null">
+        releasedate = #{releasedate,jdbcType=VARCHAR},
+      </if>
+      <if test="localPath != null">
+        local_path = #{localPath,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="org.aver.avHelper.entity.Movieinfo">
+    <!--@mbg.generated-->
+    update movieinfo
+    set original_name = #{originalName,jdbcType=VARCHAR},
+      new_name = #{newName,jdbcType=VARCHAR},
+      web_site = #{webSite,jdbcType=VARCHAR},
+      title = #{title,jdbcType=VARCHAR},
+      sorttitle = #{sorttitle,jdbcType=VARCHAR},
+      director = #{director,jdbcType=VARCHAR},
+      `year` = #{year,jdbcType=VARCHAR},
+      releasedate = #{releasedate,jdbcType=VARCHAR},
+      local_path = #{localPath,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

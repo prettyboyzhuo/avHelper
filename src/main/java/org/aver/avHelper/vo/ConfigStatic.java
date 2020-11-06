@@ -13,7 +13,7 @@ import com.thoughtworks.xstream.XStream;
 public class ConfigStatic {
 	
 	/** javbus影片信息下载地址 */
-	public static final String javBusSite = "https://www.javbus.com/";
+	public static final String javBusSite = "https://www.busfan.net/";
 	/** mgstage影片信息下载地址 */
 	public static final String mgstageSite = "https://www.mgstage.com/product/product_detail/";
 	/** fanza地址*/
