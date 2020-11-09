@@ -4,11 +4,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDate;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -32,6 +29,8 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
+
+import static org.aver.avHelper.vo.ConfigStatic.javBusSite;
 
 @Component
 public class MainServiceImpl implements MainService {
@@ -99,23 +98,6 @@ public class MainServiceImpl implements MainService {
 ////		System.out.println(file.getParent());
 //		copyMirror(file, localDir);
 //	}
-
-	public static void copyMirror(File file, String localDir) throws IOException {
-		if (file.isDirectory()){
-			System.out.println("创建文件夹" + localDir +"\\"+ file.getName());
-			new File(localDir + "\\" + file.getName()).mkdir();
-			localDir = localDir + "\\"+file.getName();
-		}else if (file.isFile()){
-			System.out.println("创建文件" + localDir +"\\"+ file.getName());
-			new File(localDir +"\\"+ file.getName()).createNewFile();
-		}
-		File[] fList = file.listFiles();//获取路径下所有目录和文件
-		if(fList != null){
-			for (File f:fList) {
-				copyMirror(f, localDir);//递归
-			}
-		}
-	}
 
 	public static void print(File file, int level){
 		for(int i = 0; i < level; ++i) {
@@ -217,7 +199,7 @@ public class MainServiceImpl implements MainService {
 
 	private void setWebSite(Movie movie, String usedSite, String shortName) {
 		if ("javbus".equals(usedSite)) {
-			movie.setWebSite(ConfigStatic.javBusSite + shortName);
+			movie.setWebSite(javBusSite + shortName);
 		}else if ("mgstage".equals(usedSite)) {
 			movie.setWebSite(ConfigStatic.mgstageSite + shortName);
 		}else if ("fanza".equals(usedSite)) {
@@ -267,7 +249,7 @@ public class MainServiceImpl implements MainService {
 			String extendName = newName.substring(newName.lastIndexOf(".") + 1).toLowerCase();
 			movieList.get(i).setNewName(shortName + "." + extendName);
 			movieList.get(i).setSorttitle(shortName);
-			movieList.get(i).setWebSite(ConfigStatic.javBusSite + shortName);
+			movieList.get(i).setWebSite(javBusSite + shortName);
 		}
 		XmlHandler.generateMovies(movieList, ConfigStatic.tempRootPath, ConfigStatic.moviesXmlName, false);
 	}
@@ -291,7 +273,7 @@ public class MainServiceImpl implements MainService {
 			if (StringUtils.isBlank(movie.getWebSite())) {
 				errorMovieListForSite.add(movie);
 				continue;
-			}else if (movie.getWebSite().contains(ConfigStatic.javBusSite)) {
+			}else if (movie.getWebSite().contains(javBusSite)) {
 				getMovieMsgTask = new GetJavBusMovieMsgTask(movie, movieListForSite, errorMovieListForSite);
 			}else if (movie.getWebSite().contains(ConfigStatic.mgstageSite)) {
 				getMovieMsgTask = new GetMgstageMovieMsgTask(movie, movieListForSite, errorMovieListForSite);
@@ -480,6 +462,81 @@ public class MainServiceImpl implements MainService {
 
 	}
 
+	@Override
+	public Movie findMovie(String fanhao) {
+		Document document = HtmlDownload.getDocBySite(javBusSite + "/search/" + fanhao, null);
+		Element waterfall = document.getElementById("waterfall");
+		//完整的视频地址
+		String movieLink = waterfall.getElementsByTag("a").get(0).attributes().get("href");
+		Movie movie = new Movie();
+		String newName = waterfall.getElementsByTag("date").get(0).text();
+		movie.setNewName(newName);
+		movie.setWebSite(movieLink);
+		Document document1 = HtmlDownload.getDocBySite(movieLink, null);
+		Elements containerEles = document1.select(".container");
+
+		//解析影片信息
+		//标题
+		movie.setTitle(containerEles.select("h3").text());
+
+		//演员
+		Elements actorEles = containerEles.select(".info .star-name");
+		if(actorEles.size() > 0){
+			Iterator<Element> actorElesIt = actorEles.iterator();
+			List<String> actors = new ArrayList<String>();
+			while(actorElesIt.hasNext()){
+				actors.add(actorElesIt.next().select("a").text());
+			}
+			movie.setActorName(actors);
+		}
+
+		Elements infoEles = containerEles.select(".info>p");
+		Element currentEle;
+		Iterator<Element> infoEleIt = infoEles.iterator();
+		while(infoEleIt.hasNext()){
+			currentEle = infoEleIt.next();
+			if(currentEle.text().contains("導演:")){
+				movie.setDirector(currentEle.select("a").text());
+			}else if(currentEle.text().contains("發行日期:")){
+				String date = currentEle.text().replace("發行日期:", "").replaceAll(" ", "");
+				movie.setReleasedate(date);
+				movie.setYear(date.substring(0, date.indexOf("-")));
+			}else if(currentEle.text().contains("類別:")){
+				Elements genreEles = currentEle.nextElementSibling().select("a");
+				List<String> genreList = new ArrayList<String>();
+				Iterator<Element> genreElesIt = genreEles.iterator();
+				while(genreElesIt.hasNext()){
+					genreList.add(genreElesIt.next().text());
+				}
+				movie.setGenre(genreList);
+			}else if(currentEle.text().contains("製作商:")){
+				movie.setStudio(currentEle.select("a").text());
+			}else if(currentEle.text().contains("系列:")){
+				movie.setSeries(currentEle.select("a").text());
+			}
+		}
+
+		//海报
+		String posterPicSite = containerEles.select(".screencap a").attr("href");
+		movie.setPosterPicSite(posterPicSite);
+		movie.setSmallPosterPicSite(posterPicSite.replace("cover", "thumb").replace("_b", ""));
+		movie.setPosterNeedCut(true);
+
+		//影片截图
+		Elements samplePicsEles = containerEles.select("#sample-waterfall a");
+		if(samplePicsEles.size() > 0){
+			Iterator<Element> samplePicsElesIt = samplePicsEles.iterator();
+			List<String> samplePicList = new ArrayList<String>();
+			while(samplePicsElesIt.hasNext()){
+				samplePicList.add(samplePicsElesIt.next().attr("href"));
+			}
+			movie.setFanartsPicSite(samplePicList);
+		}
+
+
+		return movie;
+	}
+
 	public static void main(String[] args) {
 		String nameRegEx = "[A-Za-z]+[0-9]+";
 		String filename = "(NATURAL HIGH)(NHDTB-090)宙に浮くほどイキ跳ねる「エビ反り薬漬けエステ」10 全員中出し再会SPECIAL";
@@ -491,6 +548,38 @@ public class MainServiceImpl implements MainService {
 			System.out.println(matcher.group());
 		}
 
+	}
+
+	/**
+	 * 将磁盘中的电影目录结构在本地创建一份
+	 * @param file
+	 * @param localDir
+	 * @throws IOException
+	 */
+//	public static void main(String[] args) throws IOException {
+//		File file = new File("Y:\\home\\Data");
+//		String localDir = "D:\\moviebak";
+////		new File(localDir +"\\"+ "data").mkdir();
+////		System.out.println(file.getParent());
+//		copyMirror(file, localDir);
+//	}
+
+
+	public static void copyMirror(File file, String localDir) throws IOException {
+		if (file.isDirectory()){
+			System.out.println("创建文件夹" + localDir +"\\"+ file.getName());
+			new File(localDir + "\\" + file.getName()).mkdir();
+			localDir = localDir + "\\"+file.getName();
+		}else if (file.isFile()){
+			System.out.println("创建文件" + localDir +"\\"+ file.getName());
+			new File(localDir +"\\"+ file.getName()).createNewFile();
+		}
+		File[] fList = file.listFiles();//获取路径下所有目录和文件
+		if(fList != null){
+			for (File f:fList) {
+				copyMirror(f, localDir);//递归
+			}
+		}
 	}
 
 

@@ -214,4 +214,10 @@ public class AjaxController {
     public void generatePseudoVideo() throws IOException {
         mainService.renameFile();
     }
+
+    @PostMapping("/findMovie")
+    public void findMovie() {
+        mainService.findMovie("sora277");
+    }
+
 }

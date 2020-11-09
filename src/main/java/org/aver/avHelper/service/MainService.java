@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import org.aver.avHelper.entity.Movieinfo;
 import org.aver.avHelper.vo.Movie;
 import org.springframework.stereotype.Service;
 
@@ -84,5 +85,12 @@ public interface MainService {
 	 * 将本地路径中的视频文件重新命名为番号的标准格式，如 ssni-001
 	 */
 	void renameFile();
+
+	/**
+	 * 根据番号去搜索视频信息
+	 * @param fanHao
+	 * @return
+	 */
+	Movie findMovie(String fanHao);
 	
 }

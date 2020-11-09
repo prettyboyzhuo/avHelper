@@ -10,6 +10,6 @@ import org.springframework.context.annotation.ComponentScan;
 public class AvHelperApplication {
 	public static void main(String[] args) throws Exception {
 		SpringApplication.run(AvHelperApplication.class, args);
-		BareBonesBrowserLaunch.browse("http://localhost:8080/avHelper");
+//		BareBonesBrowserLaunch.browse("http://localhost:8080/avHelper");
 	}
 }
