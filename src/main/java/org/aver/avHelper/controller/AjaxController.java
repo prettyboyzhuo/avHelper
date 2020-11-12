@@ -2,6 +2,7 @@ package org.aver.avHelper.controller;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -17,11 +18,7 @@ import org.aver.avHelper.vo.Movie;
 import org.aver.avHelper.vo.RestrictConfig;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/ajax")
@@ -215,9 +212,11 @@ public class AjaxController {
         mainService.renameFile();
     }
 
-    @PostMapping("/findMovie")
-    public void findMovie() {
-        mainService.findMovie("sora277");
+    @RequestMapping("/findMovie")
+    public void findMovie(@RequestParam("fanHao") String fanHao) {
+        System.out.println(new Date());
+        Movie movie = mainService.findMovie(fanHao);
+        System.out.println(new Date());
     }
 
 }

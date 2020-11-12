@@ -92,5 +92,19 @@ public interface MainService {
 	 * @return
 	 */
 	Movie findMovie(String fanHao);
+
+	/**
+	 * 生成电影的nfo文件
+	 * @param movie 电影信息
+	 * @param path 生成的目标目录
+	 */
+	void generateNfoInfo(Movie movie, String path);
+
+	/**
+	 * 下载图片信息
+	 * @param movie 电影信息
+	 * @param path 生成的目标目录
+	 */
+	void downloadImg(Movie movie, String path);
 	
 }
